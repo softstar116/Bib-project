@@ -1,0 +1,30 @@
+# Don't change this version, this version is buildspec.yml file's version
+
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Build started on `date`
+      - echo $NPM_AUTH_TOKEN >> .npmrc
+      - echo copying environment files
+      - aws s3 cp ${STAGE_ENV_FILE_PATH} app.env
+      - aws s3 cp ${GLOBAL_ENV_FILE_PATH} global.env
+      - cat app.env global.env >> .env
+      - ls -la 
+  build:
+    commands:
+      - echo installing dependencies  
+      - echo nove version
+      - node -v
+      - npm ci
+      - echo Building the Front End distro...
+      - npm run generate --fail-on-error
+  post_build:
+    commands:
+      - echo Build completed on `date`
+artifacts:
+  base-directory: 'dist'
+
+  files:
+    - '**/*' 
